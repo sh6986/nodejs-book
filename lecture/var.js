@@ -9,3 +9,17 @@ module.exports = {
 
 // module.export = odd;
 // module.export = [odd, even];
+
+// module 생략 가능
+// exports.odd = odd;
+// exports.even = even;
+
+// module.exports === exports === {} 같으므로 가능
+// 그러나 함수는 불가능하다.
+
+// ------
+// exports.odd = odd;
+// exports.even = even;
+
+// module.exports = {};
+// 같이 쓸 수 없다.
