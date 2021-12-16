@@ -1,8 +1,18 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
+
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './index.html'));
+});
+
+app.post('/', (req, res) => {
+    res.send('hello express');
+});
+
+app.get('/about', (req, res) => {
     res.send('hello express');
 });
 
