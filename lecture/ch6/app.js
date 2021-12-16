@@ -1,0 +1,11 @@
+const express = require('express');
+const app = express();
+
+app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
+app.get('/', (req, res) => {
+    res.send('hello express');
+});
+
+app.listen(app.get('port'), () => {
+    console.log('익스프레스 서버 실행');
+});
