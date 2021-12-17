@@ -1,8 +1,11 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
+dotenv.config();
 const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
@@ -49,19 +52,20 @@ app.use('/', (req, res, next) => {
 });
 
 
-app.use(cookieParser());
+// app.use(cookieParser());
 // app.use(cookieParser('zerochopassword'));  // 암호화된 쿠키
+app.use(cookieParser(process.env.COOKIE_SECRET));  // 암호화된 쿠키
 
-app.use(session());     // const session = {}; 처럼 세션객체 하나가 생긴다고 생각하면 됨
-// app.use(session({
-//     resave: false,
-//     saveUninitialized: false,
-//     secret: 'zerochopassword',
-//     cookie: {
-//         httpOnly: true,     // 자바스크립트로 공격당하지 않기 위해
-//     },
-//     name: 'connect.sid'
-// }));
+// app.use(session());     // const session = {}; 처럼 세션객체 하나가 생긴다고 생각하면 됨
+app.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+        httpOnly: true,     // 자바스크립트로 공격당하지 않기 위해
+    },
+    name: 'connect.sid'
+}));
 
 // 예전에는 body-parser를 require해서 사용했지만 지금은 body-parser가 express안에 들어가서
 // require하지 않고 아래처럼 사용하면 된다.
