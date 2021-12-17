@@ -14,11 +14,11 @@ app.use((req, res, next) => {
     console.log('1모든 요청에 실행');
     next();
 }, (req, res, next) => {
-    console.log('2모든 요청에 실행');
-    next();
-}, (req, res, next) => {
-    console.log('3모든 요청에 실행');
-    next();
+    try {
+        // console.log(에러야);
+    } catch (err) {
+        next(err);  // next() 에 인수가 없으면 다음 미들웨어로 넘어가지만 인수가 있으면 에러처리 미들웨어로 넘어간다.
+    }
 });
 
 app.get('/', (req, res) => {
