@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
@@ -10,18 +12,43 @@ app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심
 //     next();
 // });
 
-app.use((req, res, next) => {
-    console.log('1모든 요청에 실행');
-    next();
-}, (req, res, next) => {
-    try {
-        // console.log(에러야);
-    } catch (err) {
-        next(err);  // next() 에 인수가 없으면 다음 미들웨어로 넘어가지만 인수가 있으면 에러처리 미들웨어로 넘어간다.
-    }
-});
+// app.use((req, res, next) => {
+//     console.log('1모든 요청에 실행');
+//     next();
+// }, (req, res, next) => {
+//     try {
+//         // console.log(에러야);
+//     } catch (err) {
+//         next(err);  // next() 에 인수가 없으면 다음 미들웨어로 넘어가지만 인수가 있으면 에러처리 미들웨어로 넘어간다.
+//     }
+// });
+
+app.use(morgan('dev'));
+app.use(cookieParser());
+// app.use(cookieParser('zerochopassword'));  // 암호화된 쿠키
+
+// 예전에는 body-parser를 require해서 사용했지만 지금은 body-parser가 express안에 들어가서
+// require하지 않고 아래처럼 사용하면 된다.
+// 이 두 코드를 넣어두면 알아서 데이터가 파싱되어서 req.body.name 이런식으로 사용
+app.use(express.json());        // 클라이언트가 json으로 보냈을 때 json을 파싱해서 body로 넣어줌
+app.use(express.urlencoded({ extended: true }));    // 클라이언트에서 form 보낼때 파싱해서 body로 넣어줌
+        // extended true면 qs 모듈을 사용하고 false면 querystring모듈을 사용하는데 qs 모듈이 훨씬 강력하므로 왠만하면 true
 
 app.get('/', (req, res) => {
+    req.cookies     // { mycookie: 'test' }     // 쿠키 가져오기
+    // req.signedCookies;  // 암호화된 쿠키 가져올때
+    res.cookie('name', encodeURIComponent(name), {      // 쿠키 담기
+        expires: new Date(),
+        httpOnly: true,
+        path: '/',
+    });
+    res.clearCookie('name', encodeURIComponent(name), {      // 쿠키 지우기
+        httpOnly: true,
+        path: '/',
+    });
+
+    // req.body.name // body 데이터 가져올때
+
     res.sendFile(path.join(__dirname, './index.html'));
     // res.send('안녕하세요');
     // res.json({ hello: 'zorocho' });
