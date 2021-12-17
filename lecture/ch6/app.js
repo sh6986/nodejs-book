@@ -23,7 +23,19 @@ app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심
 //     }
 // });
 
+
 app.use(morgan('dev'));
+
+// app.use('요청경로', express.static('실제경로'));
+// ex) 요청경로 localhost:3000/zerocho.html     실제경로 learn-express/public/zerocho.html
+// ex) 요청경로 localhost:3000/hello.css        실제경로 learn-express/public/hello.css
+app.use('/', express.static(path.join(__dirname, 'public')));
+// **** 미들웨어들의 순서 중요 **** //
+// 거의 모든 미들웨어들은 내부적으로 next를 실행한다고 보면 된다.
+// 에를 들어 localhost:3000/about 을 요청했을 경우, 일단 express.static에서 정적파일을 찾고 없을경우
+// 라우터로 넘어가서 /about 주소를 매핑한다.
+// 혹은 정적파일을 요청한건데 그앞에 다른 cookieParser등의 필요없는 미들웨어가 앞에 있을경우 비효율적이므로 이곳에 위치하는게 적합
+
 app.use(cookieParser());
 // app.use(cookieParser('zerochopassword'));  // 암호화된 쿠키
 
@@ -34,6 +46,10 @@ app.use(express.json());        // 클라이언트가 json으로 보냈을 때 j
 app.use(express.urlencoded({ extended: true }));    // 클라이언트에서 form 보낼때 파싱해서 body로 넣어줌
         // extended true면 qs 모듈을 사용하고 false면 querystring모듈을 사용하는데 qs 모듈이 훨씬 강력하므로 왠만하면 true
 
+
+/**
+ * 라우터
+ */
 app.get('/', (req, res) => {
     req.cookies     // { mycookie: 'test' }     // 쿠키 가져오기
     // req.signedCookies;  // 암호화된 쿠키 가져올때
