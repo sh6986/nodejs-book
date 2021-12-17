@@ -70,6 +70,39 @@ app.use(express.json());        // 클라이언트가 json으로 보냈을 때 j
 app.use(express.urlencoded({ extended: true }));    // 클라이언트에서 form 보낼때 파싱해서 body로 넣어줌
         // extended true면 qs 모듈을 사용하고 false면 querystring모듈을 사용하는데 qs 모듈이 훨씬 강력하므로 왠만하면 true
 
+
+// form 태그의 enctype이 multipart/form-data인 경우
+const multer = require('multer');
+const fs = require('fs');
+
+try {
+    fs.readdirSync('uploads');
+} catch (error) {
+    console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('uploads');
+}
+const upload = multer({
+    storage: multer.diskStorage({   // 업로드한 파일을 어디에 저장할건지
+        destination(req, file, done) {
+            done(null, 'uploads/');     // done 첫번째 인수는 에러시에 error 넣어줌.
+        },
+        filename(req, file, done) {     // 어떤이름으로 저장할지
+            const ext = path.extname(file.originalname);
+            done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
+app.get('/upload', (req, res) => {
+    res.sendFile(path.join(__dirname, 'multipart.html'));
+});
+app.post('/upload', upload.single('image'), (req, res) => {
+    console.log(req.file);
+    res.send('ok');
+});
+
+
+
 /**
  * 라우터
  */
