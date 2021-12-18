@@ -6,6 +6,9 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 dotenv.config();
+const indexRouter = require('./routes/index');
+const userRouter = require('./routes/use');
+
 const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
@@ -106,10 +109,12 @@ app.post('/upload', upload.single('image'), (req, res) => {
 });
 
 
-
 /**
  * 라우터
  */
+app.use('/', indexRouter);
+app.use('/user', userRouter);
+
 app.use((req, res, next) => {
     // 다음 라우터나 미들웨어로 값을 보내고 싶을때 (전역변수나 app.set() 절대x. 요청마다 공유되기 때문에 값이 달라질 수 있다. 공유되도 상관없는 데이터는 가능)
     req.session.data = 'zerocho비번';     // 방법1. 단점은 세션에 저장되있으므로 다음 요청때도 값이 남아있다. ex)로그인하면 계속 요청할때마다 아이디 전달하는경우
