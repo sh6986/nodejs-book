@@ -13,6 +13,11 @@ const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
 
+// 템플릿엔진
+app.set('views', path.join(__dirname, 'views'));        // 폴더 지정
+app.set('view engine', 'pug');      // 확장자를 지정하는것. view engine은 pug
+// views 안에 pug 파일을 선택하겠다.
+
 // app.use('/about', (req, res, next) => {
 // app.use((req, res, next) => {
 //     console.log('모든 요청에 실행');
