@@ -4,6 +4,7 @@ const path = require('path');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+// const nunjucks = require('nunjucks');
 
 dotenv.config();
 const indexRouter = require('./routes/index');
@@ -13,10 +14,22 @@ const app = express();
 
 app.set('port', process.env.PORT || 3000);  // 서버에다 변수?속성을 심는 느낌. 어디에서든 쓸수있는 전역변수같은
 
+
+
 // 템플릿엔진
+// pug
 app.set('views', path.join(__dirname, 'views'));        // 폴더 지정
 app.set('view engine', 'pug');      // 확장자를 지정하는것. view engine은 pug
 // views 안에 pug 파일을 선택하겠다.
+
+// nunjucks
+// app.set('view engine', 'html');
+// nunjucks.configure('views', {
+//     express: app,
+//     watch: true,
+// });
+
+
 
 // app.use('/about', (req, res, next) => {
 // app.use((req, res, next) => {
@@ -172,15 +185,30 @@ app.get('/about', (req, res) => {
     res.send('hello express');
 });
 
-app.use((req, res, next) => {
-    res.status(404).send('404지롱');
-    // 기본적으로 정상이면 status 200이고 보통 생략한다. 404면은 별도로 status404를 보내준다.
-})
+// app.use((req, res, next) => {
+//     res.status(404).send('404지롱');
+//     // 기본적으로 정상이면 status 200이고 보통 생략한다. 404면은 별도로 status404를 보내준다.
+// })
 
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).send('에러났다.');
-});
+// app.use((err, req, res, next) => {
+//     console.error(err);
+//     res.status(500).send('에러났다.');
+// });
+
+// 404 에러도 에러로 만들어서 아래 에러핸들러에서 같이 처리하는 방법
+// res.locals.변수명으로도 템플릿 엔진 변수 생성 가능
+// app.use((req, res, next) => {
+//     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
+//     error.status = 404;
+//     next(error);
+// });
+//
+// app.use((err, req, res, next) => {
+//     res.locals.message = err.message;
+//     res.locals.error = prcess.env.NODE_ENV !== 'production' ? err : {};
+//     res.status(err.status || 500);
+//     res.render('error');
+// });
 
 app.listen(app.get('port'), () => {
     console.log('익스프레스 서버 실행');
