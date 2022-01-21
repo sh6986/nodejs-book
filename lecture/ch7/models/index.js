@@ -13,6 +13,7 @@ db.sequelize = sequelize;
 db.User = User;
 db.Comment = Comment;
 
+// db 연결 객체를 모델에 전달 (모델과 mysql을 연결)
 User.init(sequelize);
 Comment.init(sequelize);
 
