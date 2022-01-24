@@ -14,6 +14,7 @@ const pageRouter = require('./routes/page');
 
 const app = express();
 app.set('port', process.env.PORT || 8001);  // 개발시에는 8001 사용하고 배포시에는 다른 포트를 사용하므로 || 로 엮어줌
+                                            // 따로 process.env.PORT 값을 설정하지 않으면 8001
 app.set('view engine', 'html');
 nunjucks.configure('views', {
     express: app,
