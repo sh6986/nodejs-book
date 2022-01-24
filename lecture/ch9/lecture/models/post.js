@@ -23,5 +23,11 @@ module.exports = class Post extends Sequelize.Model {
         });
     }
 
-
-}
+    static associate(db) {
+        db.Post.belongsTo(db.User);
+        db.Post.belongsToMany(db.Hashtag, {
+            through: 'PostHashtag'
+            // foreignkey 안넣어주면 기본적으로 postid, hashtagid 가 된다.
+        });
+    }
+};

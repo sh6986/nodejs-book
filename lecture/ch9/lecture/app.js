@@ -11,6 +11,7 @@ const dotenv = require('dotenv');
 // dotenv 파일은 유출되지 않게 조심해야 함
 dotenv.config();
 const pageRouter = require('./routes/page');
+const {sequelize} = require('./models');
 
 const app = express();
 app.set('port', process.env.PORT || 8001);  // 개발시에는 8001 사용하고 배포시에는 다른 포트를 사용하므로 || 로 엮어줌
@@ -20,6 +21,14 @@ nunjucks.configure('views', {
     express: app,
     watch: true,
 });
+sequelize.sync({ force: false })    // Model 변경시 true면 테이블이 지워졌다가 다시 생성됨.
+                            // alter: true 는 변경시 반영됨. 가끔 기존 테이블이랑 데이터가 안맞을 경우 있음
+    .then(() => {
+        console.log('데이터베이스 연결 성공');
+    })
+    .catch((err) => {
+        console.error(err);
+    });
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
