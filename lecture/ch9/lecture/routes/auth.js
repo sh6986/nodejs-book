@@ -1,10 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-
+const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const router = express.Router();
 
-router.post('/join', async (req, res, next) => {
+router.post('/join', isNotLoggedIn, async (req, res, next) => {
     const { email, nick, password } = req.body;
 
     try {
@@ -35,7 +35,8 @@ router.post('/join', async (req, res, next) => {
     }
 });
 
-router.post('/login', (req, res, next) => {     // 미들웨어 확장시켰음
+router.post('/login', isNotLoggedIn, (req, res, next) => {     // 미들웨어 확장시켰음
+    // console.log(req.user); 로그인하기 전이므로 값이 없다.
     passport.authenticate('local',  // localStrategy를 찾는다.
         (authError, user, info) => {    // localStrategy 로직 실행 후 done() 인수 받아옴
         // 서버에러
@@ -62,6 +63,7 @@ router.post('/login', (req, res, next) => {     // 미들웨어 확장시켰음
 });
 
 router.get('/logout', isLoggedIn, (req, res) => {
+    console.log(req.user);  // 사용자정보
     req.logout();   // 서버에서 세션쿠키를 지운다.
     req.session.destroy();
     res.redirect('/');

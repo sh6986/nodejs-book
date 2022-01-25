@@ -5,6 +5,7 @@ const path = require('path');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
+const passport = require('passport');
 
 // dotenv 파일은 최대한 위에 적어야 한다.
 // dotenv 하는순간 process.env 설정값(ex. process.env.COOKIE_SECRET)들이 들어가는데 config() 아래코드부터 적용된다.
@@ -45,6 +46,11 @@ app.use(session({
         secure: false
     },
 }));
+
+// 라우터로 연결 전에 해야함
+// express session보다 아래에 위치해야 함
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(`/`, pageRouter);
 app.use('/auth', authRouter);
