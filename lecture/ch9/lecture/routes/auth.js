@@ -73,8 +73,10 @@ router.get('/logout', isLoggedIn, (req, res) => {
 // 카카오 로그인하기 누를시
 router.get('/kakao', passport.authenticate('kakao'));
         // 카카오 로그인 페이지에서 로그인한다.
-        // 미리 카카오에서 등록해놓은 리다이렉트주소(auth/kakao/callback)로 요청시키면서 데이터가 들어있는 코드를 함께 보낸다.
+        // 로그인성공시에 미리 카카오에 등록해놓은 리다이렉트주소(auth/kakao/callback)로 리다이렉트시키면서
+        // 데이터가 들어있는 코드를 함께 보낸다.
 
+// 리다이렉트 받은 주소(카카오 로그인페이지에서 로그인버튼을 누르면 요청받는 주소)
 router.get('/kakao/callback', passport.authenticate('kakao', {  // kakaoStrategy로 간다.
     failureRedirect: '/',   // 카카오 로그인 실패시
 }), (req, res) => {     // 카카오 로그인 성공시

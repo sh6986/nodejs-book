@@ -32,6 +32,7 @@ sequelize.sync({ force: false })    // Model 변경시 true면 테이블이 지�
     .catch((err) => {
         console.error(err);
     });
+
 passportConfig();
 
 app.use(morgan('dev'));
