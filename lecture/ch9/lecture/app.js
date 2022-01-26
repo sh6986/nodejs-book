@@ -14,6 +14,7 @@ dotenv.config();
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 const {sequelize} = require('./models');
+const passportConfig = require('./passport');   // passport 폴더에 index 파일
 
 const app = express();
 app.set('port', process.env.PORT || 8001);  // 개발시에는 8001 사용하고 배포시에는 다른 포트를 사용하므로 || 로 엮어줌
@@ -31,6 +32,7 @@ sequelize.sync({ force: false })    // Model 변경시 true면 테이블이 지�
     .catch((err) => {
         console.error(err);
     });
+passportConfig();
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));

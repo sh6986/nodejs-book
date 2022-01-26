@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const passport = require('passport');
 const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const router = express.Router();
 
@@ -49,8 +50,8 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {     // 미들웨어 �
             return res.redirect(`/?loginError=${info.message}`);
         }
         // 로그인 성공시
-        return req.login(user   // index.js 의 serializeUser로 간다.
-            , (loginError) => {
+        return req.login(user,   // index.js 의 serializeUser로 간다.
+            (loginError) => {
             // 에러시
             if (loginError) {
                 console.error(loginError);
@@ -66,6 +67,17 @@ router.get('/logout', isLoggedIn, (req, res) => {
     console.log(req.user);  // 사용자정보
     req.logout();   // 서버에서 세션쿠키를 지운다.
     req.session.destroy();
+    res.redirect('/');
+});
+
+// 카카오 로그인하기 누를시
+router.get('/kakao', passport.authenticate('kakao'));
+        // 카카오 로그인 페이지에서 로그인한다.
+        // 미리 카카오에서 등록해놓은 리다이렉트주소(auth/kakao/callback)로 요청시키면서 데이터가 들어있는 코드를 함께 보낸다.
+
+router.get('/kakao/callback', passport.authenticate('kakao', {  // kakaoStrategy로 간다.
+    failureRedirect: '/',   // 카카오 로그인 실패시
+}), (req, res) => {     // 카카오 로그인 성공시
     res.redirect('/');
 });
 
