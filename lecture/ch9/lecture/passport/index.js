@@ -12,7 +12,18 @@ module.exports = () => {
     // { id: 3, 'connect.sid': s%920r24084903 }
 
     passport.deserializeUser((id, done) => { // passport session이 sid에 해당하는 id가 3이라는것을 알아내고 인수로 넘겨줌
-        User.findOne({where: {id}})
+        User.findOne({
+            where: {id},
+            include: [{
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followers',
+            }, {
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followings',
+            }],
+        })
             .then(user => done(null, user)) // req.user, req.isAuthenticated() : 로그인한 사용자면 true
             .catch(err => done(err))
     });
