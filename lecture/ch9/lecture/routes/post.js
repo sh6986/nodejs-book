@@ -40,6 +40,20 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
             img: req.body.url,
             UserId: req.user.id,
         });
+
+        const hashtags = req.body.content.match(/#[^\s#]*/g);
+
+        if (hashtags) {
+            const result = await Promise.all(
+                hashtags.map(tag => {
+                    return Hashtag.findOrCreate({   // db에 해당 해시태그가 존재하지 않으면 생성
+                        where: {title: tag.slice(1).toLowerCase()},
+                    })
+                }),
+            );
+            console.log(result);
+            await post.addHashtags(result.map(r => r[0]));
+        }
         res.redirect('/');
     } catch (error) {
         console.error(error);
