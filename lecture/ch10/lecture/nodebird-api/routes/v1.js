@@ -10,7 +10,7 @@ router.post('/token', async (req, res) => {
     const {clientSecret} = req.body;
 
     try {
-        const domain = await Domain.find({
+        const domain = await Domain.findOne({
             where: {
                 clientSecret
             },
@@ -25,12 +25,14 @@ router.post('/token', async (req, res) => {
                 message: '등록되지 않은 도메인입니다. 먼저 도메인을 등록하세요',
             });
         }
-        const token = jwt.sign({
-            id: domain.user.id,
-            nick: domain.user.nick,
+
+        const token = jwt.sign({    // 토큰발급-jwt.sign, 토큰검사-jwt.verify
+            // 데이터 넣어줌
+            id: domain.User.id,
+            nick: domain.User.nick,
         }, process.env.JWT_SECRET, {
-            expiresIn: '1m',    // 1분
-            issuer: 'nodebird',
+            expiresIn: '1m',    // 유효기간(1분)
+            issuer: 'nodebird', // 누가 발급해줬는지
         });
         return res.json({
             code: 200,
