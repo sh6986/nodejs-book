@@ -40,7 +40,7 @@ exports.verifyToken = (req, res, next) => {
 
 exports.apiLimiter = new RateLimit({    // 몇분간 몇번썼는지 체크해주는 미들웨어
     windowMs: 60 * 1000,    // 1분
-    max: 1, // 1번
+    max: 10, // 1번
     delayMs: 0,  // 호출간격,
     handler(req, res) {
         res.status(this.statusCode).json({  // 429. 제한을 어겼을 경우

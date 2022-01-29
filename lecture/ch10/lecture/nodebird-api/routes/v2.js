@@ -1,10 +1,26 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const url = require('url');
 
 const {verifyToken, apiLimiter} = require('./middlewares');
 const {Domain, User, Post, Hashtag} = require('../models');
 
 const router = express.Router();
+
+router.use(async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: {host: url.parse(req.get('origin'))?.host}   // ?. 앞에가 undefined면 undefined고 존재하면 그 안에서 host를 꺼냄. 옵셔널체이닝
+    });
+    if (domain) {
+        cors({
+            origin: true,
+            credentials: true,
+        })(req, res, next);
+    } else {
+        next();
+    }
+})
 
 router.post('/token', apiLimiter, async (req, res) => {
     const {clientSecret} = req.body;
@@ -34,6 +50,9 @@ router.post('/token', apiLimiter, async (req, res) => {
             expiresIn: '1m',    // 유효기간(1분)
             issuer: 'nodebird', // 누가 발급해줬는지
         });
+        // CORS 에러 방지코드. 직접작성해도 되지만 활용성이 떨어지므로 cors 모듈 사용
+        // res.setHeader('Access-Control-Allow-Origin', 'localhohst:4000');    // 요청안가는것 방지
+        // res.setHeader('Access-Control-Allow-Credentials', 'localhohst:4000');   // 쿠키전달안되는것 방지
         return res.json({
             code: 200,
             message: '토큰이 발급되었습니다.',
