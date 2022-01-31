@@ -75,6 +75,4 @@ app.use((err, req, res, next) => {  // next 안쓰더라도 무조건 있어야�
     res.status(err.status || 500).render('error');
 });
 
-app.listen(app.get('port'), () => {
-    console.log(app.get('port'), '번 포트에서 대기중');
-});
+module.exports = app;
