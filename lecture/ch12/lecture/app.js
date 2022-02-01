@@ -5,11 +5,12 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
+const ColorHash = require('color-hash');
 
 dotenv.config();
-const connect = require('./schemas');
 const webSocket = require('./socket');
 const indexRouter = require('./routes');
+const connect = require('./schemas');
 
 const app = express();
 app.set('port', process.env.PORT || 8005);
@@ -35,6 +36,15 @@ app.use(session({
     },
 }));
 
+app.use((req, res, next) => {   // 사용자별로 색깔을 정해주기 위해
+    // 세션이 끝나기 전까지 사용자는 각각 고유한 색상이 부여된다.
+    if (!req.session.color) {
+        const colorHash = new ColorHash();
+        req.session.color = colorHash.hex(req.sessionID);
+    }
+    next();
+});
+
 app.use('/', indexRouter);
 
 app.use((req, res, next) => {
@@ -54,4 +64,4 @@ const server = app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기중');
 });
 
-webSocket(server);
+webSocket(server, app); // 라우터와 웹소켓 연결하기 위해 app도 전달
