@@ -6,15 +6,16 @@
 </head>
 <body>
 <div>F12를 눌러 console 탭과 network 탭을 확인하세요.</div>
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  const webSocket = new WebSocket("ws://localhost:8005");
-  webSocket.onopen = function () {
-    console.log('서버와 웹소켓 연결 성공!');
-  };
-  webSocket.onmessage = function (event) {
-    console.log(event.data);
-    webSocket.send('클라이언트에서 서버로 답장을 보냅니다');
-  };
+  const socket = io.connect('http://localhost:8005', {  // 일단 웹소켓이 가능한지 polling 시도해보고 가능하면 웹소켓으로 프로토콜을 바꾸기 때문에 일단은 http 프로토콜이다.
+      path: '/socket.io',   // 서버에서 (socket.js) 써놓은 path 와 동일해야 함
+      transports: ['websocket'],    // polling으로 시작하는게 싫으면 websocket으로 transports 한다.
+  });
+  socket.on('news', function (data) {   // 이벤트 리스너를 자유롭게 만들어 줄 수 있음
+      console.log(data);
+      socket.emit('reply', 'Hello Node.JS');    // 이벤트 이름과 데이터를 함께 보냄. socket.io가 json 형태로 만들어서 주고받기 가능. 실제로는 그냥 문자열인데 형태를 만들어주는것
+  });
 </script>
 </body>
 </html>
