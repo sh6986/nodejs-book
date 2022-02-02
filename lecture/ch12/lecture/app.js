@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(session({
+const sessionMiddleware = session({
     resave: false,
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
@@ -34,7 +34,8 @@ app.use(session({
         httpOnly: true,
         secure: false,
     },
-}));
+});
+app.use(sessionMiddleware);
 
 app.use((req, res, next) => {   // 사용자별로 색깔을 정해주기 위해
     // 세션이 끝나기 전까지 사용자는 각각 고유한 색상이 부여된다.
@@ -64,4 +65,4 @@ const server = app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기중');
 });
 
-webSocket(server, app); // 라우터와 웹소켓 연결하기 위해 app도 전달
+webSocket(server, app, sessionMiddleware); // 라우터와 웹소켓 연결하기 위해 app도 전달

@@ -1,6 +1,8 @@
+const cookieParser = require('cookie-parser');
 const SocketIO = require('socket.io');
+const axios = require('axios');
 
-module.exports = (server, app) => {
+module.exports = (server, app, sessionMiddleware) => {
     const io = SocketIO(server, {path: '/socket.io'});  // express랑 socket.io 연결
         // 연결하면 socket.io가 express에 <script src="/socket.io/socket.io.js"></script> 라고 작성한 해당 파일을 넣어줌
     
@@ -8,6 +10,11 @@ module.exports = (server, app) => {
     app.set('io', io);  // req.app.get('io'); 라우터에서 io 객체 사용가능
     const room = io.of('/room');
     const chat = io.of('/chat');
+
+    io.use((socket, next) => {
+        cookieParser(process.env.COOKIE_SECRET)(socket.request, socket.request.res || {}, next);
+        sessionMiddleware(socket.request, socket.request.res, next);
+    });
 
     room.on('connection', (socket) => { // 웹소켓 연결 시
         console.log('room 네임스페이스에 접속');
@@ -24,10 +31,30 @@ module.exports = (server, app) => {
             .split('/')[referer.split('/').length - 1]
             .replace(/\?.+/, '');
         socket.join(roomId);
+        socket.to(roomId).emit('join', {
+            user: 'system',
+            chat: `${req.session.color}님이 입장하셨습니다.`,
+        });
 
         socket.on('disconnect', () => {
             console.log('chat 네임스페이스 접속 해제');
             socket.leave(roomId);
+            const currentRoom = socket.adapter.rooms[roomId];
+            const userCount = currentRoom ? currentRoom.length : 0;
+            if (userCount === 0) {  // 유저가 0명이면 방 삭제
+                axios.delete('hhtp://localhost:8005/room/${roomId}')
+                .then(() => {
+                    console.log(`${roomId} 방 제거 성공`);
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+            } else {
+                socket.to(roomId).emit('exit', {
+                    user: 'system',
+                    chat: `${req.session.color}님이 퇴장하셨습니다.`
+                });
+            }
         });
     });
 };
