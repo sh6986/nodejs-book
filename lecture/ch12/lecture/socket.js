@@ -1,6 +1,7 @@
 const cookieParser = require('cookie-parser');
 const SocketIO = require('socket.io');
 const axios = require('axios');
+const cookie = require('cookie-signature');
 
 module.exports = (server, app, sessionMiddleware) => {
     const io = SocketIO(server, {path: '/socket.io'});  // express랑 socket.io 연결
@@ -42,7 +43,15 @@ module.exports = (server, app, sessionMiddleware) => {
             const currentRoom = socket.adapter.rooms[roomId];
             const userCount = currentRoom ? currentRoom.length : 0;
             if (userCount === 0) {  // 유저가 0명이면 방 삭제
-                axios.delete('hhtp://localhost:8005/room/${roomId}')
+                const signedCookies = cookie.sign(req.signedCookies['connect.sid'], process.env.COOKIE_SECRET);
+                const connectSID = `${signedCookies}`
+                // 브라우저에서 요청보낼때는 세션쿠키가 자동으로 들어가지만
+                // 서버에서 서버로 보낼때에는 세션쿠기가 안들어있으므로 직접넣어줘야 함
+                axios.delete(`hhtp://localhost:8005/room/${roomId}`, {
+                    headers: {
+                        Cookie: `connect.sid=s%3A${connectSID}`
+                    }
+                })
                 .then(() => {
                     console.log(`${roomId} 방 제거 성공`);
                 })
