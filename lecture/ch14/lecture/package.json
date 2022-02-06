@@ -7,8 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "cli": "./template.js"
+    "cli": "./command.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "commander": "^9.0.0",
+    "inquirer": "^8.2.0"
+  }
 }
