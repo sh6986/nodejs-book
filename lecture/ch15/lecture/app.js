@@ -63,6 +63,8 @@ const sessionOption = {
     secure: false,
   },
   store: new RedisStore({ client: redisClient }),
+    // 서버의 메모리에 저장하는것을 RedisStore라는 db에다가 세션정보를 저장
+    // 클러스터링(멀티 프로세싱)해도 모든 서버에서 로그인 세션데이터 공유 가능
 };
 if (process.env.NODE_ENV === 'production') {
   sessionOption.proxy = true;
